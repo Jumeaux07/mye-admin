@@ -44,7 +44,7 @@ jobs:
       - name: Run migrations (testing database)
         run: php artisan migrate --force
 
-      - name: Run tests
+      - name: Run Laravel tests
         run: php artisan test
 
   # Job pour déployer Laravel
