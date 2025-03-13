@@ -44,9 +44,6 @@ jobs:
       - name: Generate application key
         run: php artisan key:generate
 
-      - name: Run migrations (testing database)
-        run: php artisan migrate --force
-
       - name: Run Laravel tests
         run: php artisan test
 
