@@ -38,6 +38,9 @@ jobs:
       - name: Copy .env file
         run: cp .env.example .env
 
+      - name: Debug Environment Variables
+        run: cat .env
+
       - name: Generate application key
         run: php artisan key:generate
 
