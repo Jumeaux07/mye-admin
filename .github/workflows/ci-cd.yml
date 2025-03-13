@@ -44,15 +44,6 @@ jobs:
       - name: Generate application key
         run: php artisan key:generate
 
-      - name: Test SSH Connection
-        uses: appleboy/ssh-action@master
-        with:
-          host: 109.106.246.65
-          username: "u109636287"
-          key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD6jPmUpKeHHnx0B+XIzLgXBTJU9fKvdibMOY5h4la5F9g2Mi45EVuqsQYJRWAolo5qQBaO6m4FtniMJ4Rn8HJsBAmtCUM4RDaPNUwLr5WPI+IIz4DONbEh9DIrVWuD4LMtEov2k+mVDXszQGMh9lsqbZ2jZ0VneYzR5iXuBfyXV76mcw/FlNd5Q5jGkNYmZRDJBguW3roZtSO1UNWwfbb6+Dv7rMPTSRFeXSMDkytG4vfe+OxF4V4A4FzhNkN7mybKAokGdOrgtHsqrhjIhmAO2hiq6BKXno00nNArRjjsoLyV92A5nYG8LB5Knp8+glkVOmpMWgCG5o5j2xUQfADN u109636287@nl-srv-web481.main-hosting.eu
-          port: 65002
-          script: "echo 'Connexion SSH réussie !'"
-
   # Job pour déployer Laravel
   deploy:
     needs: test
@@ -71,22 +62,15 @@ jobs:
       - name: Install dependencies
         run: composer install --no-dev --optimize-autoloader
 
-      - name: Deploy to server via SSH
-        uses: appleboy/ssh-action@master
-        with:
-          host: 109.106.246.65
-          username: "u109636287"
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 65002
-          script: |
-            cd /var/www/${{ env.SUBDOMAIN }}.${{ env.MAIN_DOMAIN }}
-            git pull origin main
-            composer install --no-dev --optimize-autoloader
-            php artisan migrate --force
-            php artisan config:clear
-            php artisan cache:clear
-            php artisan route:clear
-            php artisan view:clear
-            chown -R www-data:www-data storage bootstrap/cache
-            chmod -R 775 storage bootstrap/cache
-            exit
+      - name: Deploy to server via SSH with Password
+        run: |
+          sudo apt-get update && sudo apt-get install -y expect
+          expect <<EOF
+          spawn ssh -o StrictHostKeyChecking=no -p 65002 u109636287@109.106.246.65
+          expect "password:"
+          send "Pjumeaux3-\r"
+          expect "$ "
+          send "cd /var/www/${{ env.SUBDOMAIN }}.${{ env.MAIN_DOMAIN }} && git pull origin main && composer install --no-dev --optimize-autoloader && php artisan migrate --force && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear && chown -R www-data:www-data storage bootstrap/cache && chmod -R 775 storage bootstrap/cache && exit\r"
+          expect eof
+          EOF
+        shell: bash
