@@ -44,6 +44,15 @@ jobs:
       - name: Generate application key
         run: php artisan key:generate
 
+      - name: Test SSH Connection
+        uses: appleboy/ssh-action@master
+        with:
+          host: 109.106.246.65
+          username: "u109636287"
+          key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD6jPmUpKeHHnx0B+XIzLgXBTJU9fKvdibMOY5h4la5F9g2Mi45EVuqsQYJRWAolo5qQBaO6m4FtniMJ4Rn8HJsBAmtCUM4RDaPNUwLr5WPI+IIz4DONbEh9DIrVWuD4LMtEov2k+mVDXszQGMh9lsqbZ2jZ0VneYzR5iXuBfyXV76mcw/FlNd5Q5jGkNYmZRDJBguW3roZtSO1UNWwfbb6+Dv7rMPTSRFeXSMDkytG4vfe+OxF4V4A4FzhNkN7mybKAokGdOrgtHsqrhjIhmAO2hiq6BKXno00nNArRjjsoLyV92A5nYG8LB5Knp8+glkVOmpMWgCG5o5j2xUQfADN u109636287@nl-srv-web481.main-hosting.eu
+          port: 65002
+          script: "echo 'Connexion SSH réussie !'"
+
   # Job pour déployer Laravel
   deploy:
     needs: test
